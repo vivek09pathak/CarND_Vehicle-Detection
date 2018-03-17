@@ -38,32 +38,37 @@ You're reading it!
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
+The code for this step is contained in the Third code cell of the 'Vehicle_Detection' of IPython notebook.As I read using glob library the file provided by Udacity data set and saved them into to list of car and not_car  
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
 
 ![alt text][image1]
 
-I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
+I then explored YCrCb color spaces and `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the car classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
-Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
+I used diiferent file Extract_features.py
+
+Here is an example using the `YCrCb` color space and HOG parameters of `orientations=9`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
 
 
 ![alt text][image2]
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+I tried various combinations of parameters like HSV,LUV where my car were not detected for those color space and different oreints like 7 and 11 with cell per block 3 though classifier was trained with less features but lot of outliers were there and noise also was generated so finally I came up with 'YCrCb' color space with `orientations=9`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+I trained a Non_linear SVM using using kernel as 'rbf' to classify my dataset and I used color sapce as YCrCb and spatial bin with as 16 size fetures with Hog feature  Using: 9 orientations 8 pixels per cell and 2 cells per block as well which gave me total of Feature vector length: 6156
+
+I saved the SVM in file **svc_pickle** as it gave me accuracy of around 99.14% 
 
 ### Sliding Window Search
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
+I used search and classify method for sliding window as I defined differnt windows size of different shape to classify my car better as
+I searched for diiferent shape of windows but I came up with for **VIDEO** as (96,96),(128,108),(64,64) and for large window size I choosed 0.7 as overlapping and for smaller window I used 0.5
 
 ![alt text][image3]
 
@@ -77,16 +82,18 @@ Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spat
 ### Video Implementation
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./Project_Output_Video.mp4)
 
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
+I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected. 
+
+I also used averaging of previous frames as I used heatmap values to average them out for previous 25 frames from when car is detected and stored in global variable so where frame was not able to detect car I averaged out using heat map
 
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
-### Here are six frames and their corresponding heatmaps:
+### Here are four frames and their corresponding heatmaps:
 
 ![alt text][image5]
 
@@ -104,5 +111,7 @@ Here's an example result showing the heatmap from a series of frames of video, t
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.
+The use of kernel for SVM as 'rbf' can be replaced with used with grid search view function to detect frames with might reduce noise
+The rendering of video is very slow which can be replaced by linear SVC and better fetures classify like flipping of images so in real time rendering is fast for the images but have to be careful with outliers
 
